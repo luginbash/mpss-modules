@@ -1982,12 +1982,9 @@ retry:
 		}
 
 		pinned_pages->nr_pages = get_user_pages(
-				current,
-				mm,
 				(uint64_t)addr,
 				nr_pages,
 				!!(prot & SCIF_PROT_WRITE),
-				0,
 				pinned_pages->pages,
 				pinned_pages->vma);
 		up_write(&mm->mmap_sem);
@@ -2007,7 +2004,7 @@ retry:
 				/* Roll back any pinned pages */
 				for (i = 0; i < pinned_pages->nr_pages; i++) {
 					if (pinned_pages->pages[i])
-						page_cache_release(pinned_pages->pages[i]);
+						put_page(pinned_pages->pages[i]);
 				}
 				prot &= ~SCIF_PROT_WRITE;
 				try_upgrade = false;
